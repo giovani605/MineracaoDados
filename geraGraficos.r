@@ -1,12 +1,21 @@
 library("ggplot2")
 library("zoo")
-library(grid)
+library("grid")
 
 dados <- read.csv("tabelaTuplas.csv")
 
 dados$teste <- as.yearmon(paste(dados$year, dados$month), "%Y %m")
 dados$ordem <- dados$month + (dados$year*2)
 
+## modelo 1
+modelo <- lm(dados$production ~ dados$temperature + dados$Precipitation + dados$solo)
+summary(modelo)
+
+
+d <- density(dados$temperature) # densidade da temperatura
+plot(d) # plota a densidade
+
+## criar uma corelação entre produção e temperatura
 
 
 field0 <- subset(dados,field == 0,select = c(field,month,year,production,age,ordem,tempo))
@@ -30,25 +39,39 @@ ggplot(subset(dados,select = field < 5),aes(x = dados$teste,y=dados$production,c
 
 dados$fator <- factor(dados$field)
 ggplot(dados,aes(x = dados$teste,y=dados$production,color=dados$fator))+
- geom_smooth(se = FALSE)
-
+ geom_smooth(se = FALSE) 
+geom_smooth(se = FALSE)
 corte1 <- subset(dados,subset = dados$field < 7)
 p1 <- ggplot(corte1,aes(x = corte1$teste,y=corte1$production,color=corte1$fator))+
+ + labs(x="Field",y="Produção",colour="Field") 
++ geom_smooth(method = "lm",formula =corte1$production ~ corte1$temperature  )
+p1
+corte2 <- subset(dados,subset = dados$field >= 7 & dados$field < 14)
+p2 <-ggplot(corte2,aes(x = corte2$teste,y=corte2$production,color=corte2$fator))+
   geom_smooth(se = FALSE) + labs(x="Field",y="Produção",colour="Field") 
-
-corte1 <- subset(dados,subset = dados$field >= 7 & dados$field < 14)
-p2 <-ggplot(corte1,aes(x = corte1$teste,y=corte1$production,color=corte1$fator))+
+p2
+corte3 <- subset(dados,subset = dados$field >= 14 & dados$field < 21)
+p3 <-ggplot(corte3,aes(x = corte3$teste,y=corte3$production,color=corte3$fator))+
   geom_smooth(se = FALSE) + labs(x="Field",y="Produção",colour="Field") 
-
-corte1 <- subset(dados,subset = dados$field >= 14 & dados$field < 21)
-p3 <-ggplot(corte1,aes(x = corte1$teste,y=corte1$production,color=corte1$fator))+
+p3
+corte4 <- subset(dados,subset = dados$field >= 21 & dados$field < 28)
+p4 <-ggplot(corte4,aes(x = corte4$teste,y=corte4$production,color=corte4$fator))+
   geom_smooth(se = FALSE) + labs(x="Field",y="Produção",colour="Field") 
-
-corte1 <- subset(dados,subset = dados$field >= 21 & dados$field < 28)
-p4 <-ggplot(corte1,aes(x = corte1$teste,y=corte1$production,color=corte1$fator))+
-  geom_smooth(se = FALSE) + labs(x="Field",y="Produção",colour="Field") 
+p4
 
 multiplot(p1,p2,p3,p4,cols = 2)
+
+grid.arrange(p1,p2,p3,p4)
+
+# plot do modelo
+ggplot(corte1,aes(x = corte1$temperature ,y=corte1$production,color=corte1$fator)) + 
+  geom_smooth(method = "lm",formula = corte1$temperature ~ corte1$production) 
+
+predicao <- predict(modelo,corte1)
+ggplot(predicao,aes(x = corte1$temperature ,y=corte1$production,color=corte1$fator)) + 
+  geom_smooth(method = "lm",formula = corte1$temperature ~ corte1$production) 
+
+
 
 variosplots <- function (dados,plotPerPlot){
   a = 0;
