@@ -7,13 +7,42 @@ dados <- read.csv("tabelaTuplas.csv")
 dados$teste <- as.yearmon(paste(dados$year, dados$month), "%Y %m")
 dados$ordem <- dados$month + (dados$year*2)
 
+#Densidades
+d <- density(dados$temperature) # densidade da temperatura
+plot(d,xlab = "Temperatura",ylab = "Densidade",main="") # plota a densidade
+
+dp <- density(dados$Precipitation) # densidade da temperatura
+plot(dp,xlab = "Precipitação",ylab = "Densidade",main="") # plota a densidade
+
+#agua no sllo
+ds <- density(dados$solo) # densidade da temperatura
+plot(ds,xlab = "Agua no solo(média entre as camadas) ",ylab = "Densidade",main="") # plota a densidade
+
+
+# correlacao
+cor(dados$Precipitation , dados$solo)
+
+cor(dados$Precipitation , dados$production)
+
+cor(dados$solo, dados$production)
+
+cor(dados$age, dados$production)
+
+cor(dados$temperature , dados$production)
+
+
+#rename
+dados$idade <- dados$age
+dados$temperatura <- dados$temperature
+dados$aguaSolo <- dados$solo
+dados$precipitacao <- dados$Precipitation
 ## modelo 1
-modelo <- lm(dados$production ~ dados$temperature + dados$Precipitation + dados$solo)
+modelo <- lm(dados$production ~ dados$precipitacao + dados$aguaSolo + dados$temperatura + dados$idade)
 summary(modelo)
 
 
-d <- density(dados$temperature) # densidade da temperatura
-plot(d) # plota a densidade
+summary(lm(dados$production ~ dados$Precipitation))
+?lm
 
 ## criar uma corelação entre produção e temperatura
 
