@@ -148,5 +148,19 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
-  
+
+## Validacao
+dadosValidar <- read.csv("tabelaTuplasValidar.csv")
+dadosValidar$idade <- dadosValidar$age
+dadosValidar$temperatura <- dadosValidar$temperature
+dadosValidar$aguaSolo <- dadosValidar$solo
+dadosValidar$precipitacao <- dadosValidar$Precipitation
+resultado <- as.data.frame(predict(modelo,newdata = dadosValidar))
+names(resultado) <- c("production")
+resultado$Id <- seq(1,nrow(resultado),1)
+resultadoFinal <- resultado[,c(2,1)]
+write.csv(resultadoFinal,"submission.csv")
+
+
+
 
