@@ -8,10 +8,24 @@ reg = linear_model.LinearRegression()
 dados = pd.read_csv("tabelaTuplas.csv")
 
 ## concateno as colunas em um novo dataframe
-dadosX = pd.concat([dados["temperature"] , dados["solo"]],axis=1)
+dadosX = pd.concat([dados["temperature"] , dados["solo"],dados["age"],dados["Precipitation"]],axis=1)
 
-print(dadosX)
+#print(dadosX)
 dadosY = dados["production"]
 
 reg.fit(dadosX, dadosY)
 print(reg.coef_)
+
+print("iniciar predicao")
+dadosValidar = pd.read_csv("tabelaTuplasValidar.csv")
+dadosVal = pd.concat([dadosValidar["temperature"], dadosValidar["solo"],dadosValidar["age"],dadosValidar["Precipitation"]],axis=1)
+
+predicao = reg.predict(dadosVal)
+
+arrayId = dadosValidar["Id"]
+
+datasetResultado = pd.DataFrame({"Id": arrayId})
+
+datasetResultado["production"] = predicao
+print(datasetResultado)
+datasetResultado.to_csv("submission.csv")

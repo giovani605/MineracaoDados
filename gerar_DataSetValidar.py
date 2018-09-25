@@ -14,7 +14,7 @@ def procurarTupla(dict,field):
         if entrada["field"] == field:
             return entrada
 
-def salvarTupla(tabela,field,year,month,age,temperatura,Precipitation,medSolo):
+def salvarTupla(tabela,field,year,month,age,temperatura,Precipitation,medSolo,id):
     linha = {}
     linha[fields[0]] = field
     linha[fields[1]] = month
@@ -24,6 +24,7 @@ def salvarTupla(tabela,field,year,month,age,temperatura,Precipitation,medSolo):
     linha[fields[5]] = temperatura
     linha[fields[6]] = Precipitation
     linha[fields[7]] = medSolo
+    linha[fields[8]] = id
     print(linha)
     csv_writer.writerow(linha)
 
@@ -32,7 +33,7 @@ def mediaSolo(l1,l2,l3,l4):
 
 
 
-fields = ['field','month','year','age','tempo', 'temperature','Precipitation','solo']
+fields = ['field','month','year','age','tempo', 'temperature','Precipitation','solo','Id']
 
 
 tabela = open('tabelaTuplasValidar.csv','w')
@@ -55,7 +56,7 @@ for dado in dictDados:
         # procurar o match com meu teste
         if comparar(dado,d):
             medSolo = mediaSolo(d['Soilwater_L1'],d['Soilwater_L2'],d['Soilwater_L3'],d['Soilwater_L4'])
-            salvarTupla(tabela,dado["field"],dado["harvest_year"],dado["harvest_month"],dado["age"],d['temperature'],d['Precipitation'],medSolo)
+            salvarTupla(tabela,dado["field"],dado["harvest_year"],dado["harvest_month"],dado["age"],d['temperature'],d['Precipitation'],medSolo,dado["Id"])
             print(" ")
           #  print(dictField.fieldnames)
             ## criar uma nova entrada no dict
