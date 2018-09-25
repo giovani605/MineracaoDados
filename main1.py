@@ -41,16 +41,16 @@ csv_writer = csv.DictWriter(tabela, fieldnames=fields, delimiter=',')
 csv_writer.writeheader()
 
 
-dados = open("dados/train.csv",'r')
+dados = open("datasets/train.csv",'r')
 dictDados = csv.DictReader(dados)
-dadosSoil = open("dados/soil_data.csv",'r')
+dadosSoil = open("datasets/soil_data.csv",'r')
 dictSoil = csv.DictReader(dadosSoil)
 for dado in dictDados:
     # carrega o dadso do field
-    fieldcsv = open("dados/field-"+dado["field"]+".csv",'r')
+    fieldcsv = open("datasets/field-"+dado["field"]+".csv",'r')
     dictField = csv.DictReader(fieldcsv)
     tupla = procurarTupla(dictSoil,dado["field"])
-    dadosSoil = open("dados/soil_data.csv", 'r')
+    dadosSoil = open("datasets/soil_data.csv", 'r')
     dictSoil = csv.DictReader(dadosSoil)
     for d in dictField:
         # procurar o match com meu teste
