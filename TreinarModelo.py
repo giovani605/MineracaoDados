@@ -23,7 +23,9 @@ def testeMelhorAlpha(X,Y):
         print(clf.intercept_)
         print("Score")
         print(clf.score(X,Y))
-        if((math.fabs(clf.score(X,Y)) < bestScore) and (math.fabs(clf.score(X,Y)) != 0.0)):
+        scores = cross_val_score(
+            clf, dadosX, dadosY, scoring='neg_mean_absolute_error', cv=10)
+        if((math.fabs(np.mean(scores)) <  bestScore) and (math.fabs(clf.score(X,Y)) != 0.0)):
             bestScore = math.fabs(clf.score(X, Y))
             bestAlpha = alpha
         alpha += astep
@@ -51,9 +53,11 @@ print(clf.score(dadosX,dadosY)) ## quero q este score fique mais eprto de 0
 rfe = RFE(estimator=clf, n_features_to_select=1, step=1)
 rfe.fit(dadosX, dadosY)
 print("imporntancia das features " + str(rfe.ranking_))
-#scores = cross_val_score(
- #   clf, dadosX, dadosY, scoring='f1_macro')
-#print(scores)
+print("cross validataion")
+scores = cross_val_score(
+    clf, dadosX, dadosY, scoring='neg_mean_absolute_error',cv=10)
+print((scores))
+print(np.mean(scores))
 
 
 #reg.fit(dadosX, dadosY)
