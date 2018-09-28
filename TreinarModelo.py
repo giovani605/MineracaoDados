@@ -24,8 +24,8 @@ def testeMelhorAlpha(X,Y):
         print("Score")
         print(clf.score(X,Y))
         scores = cross_val_score(
-            clf, dadosX, dadosY, scoring='neg_mean_absolute_error', cv=10)
-        if((math.fabs(np.mean(scores)) <  bestScore) and (math.fabs(clf.score(X,Y)) != 0.0)):
+            clf, dadosX, dadosY, scoring='neg_mean_absolute_error', cv=5)
+        if((math.fabs(np.mean(scores)) <  bestScore) ):
             bestScore = math.fabs(clf.score(X, Y))
             bestAlpha = alpha
         alpha += astep
@@ -38,11 +38,12 @@ reg = linear_model.LinearRegression()
 dados = pd.read_csv("tabelaTuplas.csv")
 
 ## concateno as colunas em um novo dataframe
-dadosX = pd.concat([dados["temperature"], dados["solo"],dados["Precipitation"], dados["age"]], axis=1)
+dadosX = pd.concat([dados["temperature"], dados["solo"],dados["Precipitation"], dados["age"],dados["month"]], axis=1)
 
 #print(dadosX)
 dadosY = dados["production"]
 alpha = testeMelhorAlpha(dadosX,dadosY)
+#alpha = 0.2
 clf = linear_model.Lasso(alpha=alpha)
 clf.fit(dadosX, dadosY)
 print(clf.coef_)
@@ -71,7 +72,7 @@ print(np.mean(scores))
 def escreverSubmissao(classificador):
     print("iniciar predicao")
     dadosValidar = pd.read_csv("tabelaTuplasValidar.csv")
-    dadosVal = pd.concat([dadosValidar["temperature"], dadosValidar["solo"],dadosValidar["age"],dadosValidar["Precipitation"]],axis=1)
+    dadosVal = pd.concat([dadosValidar["temperature"], dadosValidar["solo"],dadosValidar["Precipitation"],dadosValidar["age"],dadosValidar["month"]],axis=1)
 
     predicao = classificador.predict(dadosVal)
 
@@ -83,4 +84,4 @@ def escreverSubmissao(classificador):
     print(datasetResultado)
     datasetResultado.to_csv("submission.csv")
 
-#escreverSubmissao(clf)
+escreverSubmissao(clf)
