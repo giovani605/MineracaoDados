@@ -38,9 +38,9 @@ reg = linear_model.LinearRegression()
 dados = pd.read_csv("tabelaTuplas.csv")
 
 ## concateno as colunas em um novo dataframe
-dadosX = pd.concat([dados["temperature"], dados["solo"],dados["Precipitation"], dados["age"],dados["month"]], axis=1)
-
-#print(dadosX)
+#dadosX = pd.concat([dados["temperature"], dados["solo"],dados["Precipitation"], dados["age"],dados["month"]], axis=1)
+dadosX = dados.drop(columns="production")
+print(dadosX)
 dadosY = dados["production"]
 alpha = testeMelhorAlpha(dadosX,dadosY)
 #alpha = 0.2
@@ -84,4 +84,4 @@ def escreverSubmissao(classificador):
     print(datasetResultado)
     datasetResultado.to_csv("submission.csv")
 
-escreverSubmissao(clf)
+#escreverSubmissao(clf)

@@ -1,4 +1,5 @@
 import csv
+import json
 # Esse scrpt cria uma tupla para cada dado
 
 def comparar(teste,field):
@@ -14,26 +15,28 @@ def procurarTupla(dict,field):
         if entrada["field"] == field:
             return entrada
 
-def salvarTupla(tabela,field,year,month,production,age,temperatura,Precipitation,medSolo):
-    linha = {}
-    linha[fields[0]] = field
-    linha[fields[1]] = month
-    linha[fields[2]] = year
-    linha[fields[3]] = production
-    linha[fields[4]] = age
-    linha[fields[5]] = str(month)+"/"+str(year)
-    linha[fields[6]] = temperatura
-    linha[fields[7]] = Precipitation
-    linha[fields[8]] = medSolo
-    print(linha)
-    csv_writer.writerow(linha)
+def salvarTupla(tabela, objJson):
+
+    print(objJson)
+    csv_writer.writerow(objJson)
 
 def mediaSolo(l1,l2,l3,l4):
     return (float(l1) + float(l2) + float(l3) + float(l4))/4
 
 
 
-fields = ['field','month','year','production','age','tempo', 'temperature','Precipitation','solo']
+fields = [      "field",
+                "harvest_year",
+                "harvest_month",
+                "production",
+                "age",
+                "temperature",
+                "Precipitation","Soilwater_L3",
+                "dewpoint",
+                "Soilwater_L4",
+                "windspeed",
+                "Soilwater_L1",
+                "Soilwater_L2"]
 
 
 tabela = open('tabelaTuplas.csv','w')
@@ -54,11 +57,24 @@ for dado in dictDados:
     dictSoil = csv.DictReader(dadosSoil)
     for d in dictField:
         # procurar o match com meu teste
+        # Dado vem do train.csv , d vem do field##.csv , clima
+        #falta o soil data
         if comparar(dado,d):
-            medSolo = mediaSolo(d['Soilwater_L1'],d['Soilwater_L2'],d['Soilwater_L3'],d['Soilwater_L4'])
-            salvarTupla(tabela,dado["field"],dado["harvest_year"],dado["harvest_month"],dado["production"],dado["age"],d['temperature'],d['Precipitation'],medSolo)
+            salvarTupla(tabela, {
+                "field": dado["field"],
+                "harvest_year": dado["harvest_year"],
+                "harvest_month": dado["harvest_month"],
+                "production": dado["production"],
+                "age": dado["age"],
+                "temperature": d['temperature'],
+                "Precipitation": d['Precipitation'],
+                "Soilwater_L3": d['Soilwater_L3'],
+                "dewpoint": d['dewpoint'],
+                "Soilwater_L4": d['Soilwater_L4'],
+                "windspeed": d['windspeed'],
+                "Soilwater_L1": d['Soilwater_L1'],
+                "Soilwater_L2": d['Soilwater_L2']
+            })
             print(" ")
-          #  print(dictField.fieldnames)
-            ## criar uma nova entrada no dict
 
 
