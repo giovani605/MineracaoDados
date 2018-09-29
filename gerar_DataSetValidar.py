@@ -23,7 +23,8 @@ def mediaSolo(l1,l2,l3,l4):
 
 
 
-fields = ["field",
+fields = [      "Id",
+                "field",
                 "harvest_year",
                 "harvest_month",
                 "age",
@@ -57,6 +58,7 @@ for dado in dictDados:
         if comparar(dado,d):
             #medSolo = mediaSolo(d['Soilwater_L1'],d['Soilwater_L2'],d['Soilwater_L3'],d['Soilwater_L4'])
             salvarTupla(tabela, {
+                "Id": dado["Id"],
                 "field": dado["field"],
                 "harvest_year": dado["harvest_year"],
                 "harvest_month": dado["harvest_month"],

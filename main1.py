@@ -25,10 +25,10 @@ def mediaSolo(l1,l2,l3,l4):
 
 
 
-fields = [      "field",
+fields = [      "Id",
+                "field",
                 "harvest_year",
                 "harvest_month",
-                "production",
                 "age",
                 "temperature",
                 "Precipitation","Soilwater_L3",
@@ -36,7 +36,9 @@ fields = [      "field",
                 "Soilwater_L4",
                 "windspeed",
                 "Soilwater_L1",
-                "Soilwater_L2"]
+                "Soilwater_L2",
+                "production"
+                ]
 
 
 tabela = open('tabelaTuplas.csv','w')
@@ -61,10 +63,10 @@ for dado in dictDados:
         #falta o soil data
         if comparar(dado,d):
             salvarTupla(tabela, {
+                "Id": dado["Id"],
                 "field": dado["field"],
                 "harvest_year": dado["harvest_year"],
                 "harvest_month": dado["harvest_month"],
-                "production": dado["production"],
                 "age": dado["age"],
                 "temperature": d['temperature'],
                 "Precipitation": d['Precipitation'],
@@ -73,7 +75,8 @@ for dado in dictDados:
                 "Soilwater_L4": d['Soilwater_L4'],
                 "windspeed": d['windspeed'],
                 "Soilwater_L1": d['Soilwater_L1'],
-                "Soilwater_L2": d['Soilwater_L2']
+                "Soilwater_L2": d['Soilwater_L2'],
+                "production": dado["production"]
             })
             print(" ")
 
