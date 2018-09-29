@@ -1,6 +1,7 @@
 library("ggplot2")
 library("zoo")
 library("grid")
+library("dbscan")
 
 dados <- read.csv("tabelaTuplas.csv")
 
@@ -30,6 +31,58 @@ cor(dados$age, dados$production)
 
 cor(dados$temperature , dados$production)
 
+## agrupamento KMEANS
+dados$corField <- factor(dados$field)
+selecao <- subset(dados,select = c(production,Precipitation,solo));
+kmResult <- kmeans(selecao,centers = 10);
+kmDataFrame <- data.frame(dados,cluster=factor(kmResult$cluster))
+
+ggplot(kmDataFrame, aes(kmDataFrame$production,kmDataFrame$Precipitation,color=kmDataFrame$cluster)) + geom_point()
+
+## adicionando mais dimensoes
+selecao <- subset(dados,select = c(solo,production,Precipitation));
+kmResult <- kmeans(selecao,centers = 10);
+kmDataFrame <- data.frame(dados,cluster=factor(kmResult$cluster))
+
+## Cluster kmeans 10
+p1 <- ggplot(kmDataFrame, aes(kmDataFrame$Precipitation,kmDataFrame$solo,color=kmDataFrame$cluster)) +
+  geom_point() + labs(x="Precipitação",y="Água no solo",colour="Cluster") 
+
+p2 <-ggplot(kmDataFrame, aes(kmDataFrame$production,kmDataFrame$solo,color=kmDataFrame$cluster)) +
+  geom_point() + labs(x="Produção",y="Água no solo",colour="Cluster") 
+
+p3 <-ggplot(kmDataFrame, aes(kmDataFrame$production,kmDataFrame$Precipitation,color=kmDataFrame$cluster)) +
+  geom_point() + labs(x="Produção",y="Precipitação",colour="Cluster") 
+
+multiplot(p1,p2,p3,cols = 1)
+
+
+## agrupamento por field
+ggplot(dados, aes(dados$production,dados$Precipitation,color=dados$field)) + geom_point() +
+  scale_color_gradientn(colours = rainbow(5))
+## agrupamento por field
+ggplot(dados, aes(dados$production,dados$solo,color=dados$field)) + geom_point() +
+  scale_color_gradientn(colours = rainbow(5))
+
+### DBSCAN
+
+dados$corField <- factor(dados$field)
+selecao <- subset(dados,select = c(production,Precipitation,solo));
+dbResult <- dbscan(selecao,eps =0.1 ,minPts = 10);
+dbDataFrame <- data.frame(dados,cluster=dbResult$cluster)
+dbDataFrame
+
+## Cluster DBSCAN
+p1 <- ggplot(dbDataFrame, aes(dbDataFrame$Precipitation,dbDataFrame$solo,color=dbDataFrame$cluster)) +
+  geom_point() + labs(x="Precipitação",y="Água no solo",colour="Cluster") +  scale_color_gradientn(colours = rainbow(20))
+
+p2 <-ggplot(dbDataFrame, aes(dbDataFrame$production,dbDataFrame$solo,color=dbDataFrame$cluster)) +
+  geom_point() + labs(x="Produção",y="Água no solo",colour="Cluster")  +  scale_color_gradientn(colours = rainbow(20))
+
+p3 <-ggplot(dbDataFrame, aes(dbDataFrame$production,dbDataFrame$Precipitation,color=dbDataFrame$cluster)) +
+  geom_point() + labs(x="Produção",y="Precipitação",colour="Cluster")  +  scale_color_gradientn(colours = rainbow(20))
+
+multiplot(p1,p2,p3,cols = 1)
 
 #rename
 dados$idade <- dados$age
@@ -148,5 +201,19 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
-  
+
+## Validacao
+dadosValidar <- read.csv("tabelaTuplasValidar.csv")
+dadosValidar$idade <- dadosValidar$age
+dadosValidar$temperatura <- dadosValidar$temperature
+dadosValidar$aguaSolo <- dadosValidar$solo
+dadosValidar$precipitacao <- dadosValidar$Precipitation
+resultado <- as.data.frame(predict(modelo,newdata = dadosValidar))
+names(resultado) <- c("production")
+resultado$Id <- seq(1,nrow(resultado),1)
+resultadoFinal <- resultado[,c(2,1)]
+write.csv(resultadoFinal,"submission.csv")
+
+
+
 
