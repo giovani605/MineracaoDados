@@ -46,27 +46,59 @@ def selecionarBestFeatures(df, vetorMelhores):
     return novoDf
 
 #TODO
-#def testGrid(X,Y):
-
-
-def selecionarMelhorQtdFeatures(X,Y,clf):
+def testGrid(X,Y):
     bestNFeatures = 1
     bestScore = 1
     vetorMelhores = []
-    for a in range(1,10):
+    bestAlpha = 0;
+
+    alpha = 0.1;
+    astep = 0.01;
+    limite = 1;
+    melhores = {}
+    while alpha < limite:
+        print("Alpha " + str(alpha))
+        clf = linear_model.Lasso(alpha=alpha)
+        clf.fit(X,Y)
+        scores = selecionarMelhorQtdFeatures(X, Y, clf,alpha)
+        print("alpha : " + str(alpha) + " BestScore " + str(bestScore) + " Novo Best  " + str(scores["bestScore"]))
+        if scores["bestScore"] < bestScore:
+            bestScore = scores["bestScore"]
+            melhores = scores
+            bestAlpha = alpha
+
+        alpha += astep
+    print("Melhor combinacao")
+    print(melhores)
+    return melhores
+
+
+
+
+
+
+def selecionarMelhorQtdFeatures(X,Y,clf,alpha):
+    bestNFeatures = 1
+    bestScore = 1
+    vetorMelhores = {}
+    for a in range(1,len(X.columns)):
         rfe = RFE(estimator=clf, n_features_to_select=a, step=1)
         rfe.fit(X, Y)
         selecionados = selecionarBestFeatures(X,rfe.ranking_)
         scores = cross_val_score(
             clf, selecionados, dadosY, scoring='neg_mean_absolute_error', cv=10)
+
+        print(" Teste a = " + str(a) + " bestScore " + str(bestScore) + " Novo score  " + str(math.fabs(np.mean(scores))))
         if ((math.fabs(np.mean(scores)) < bestScore)):
-            bestScore = math.fabs(clf.score(X, Y))
+            bestScore = math.fabs(np.mean(scores))
             bestNFeatures = a
             vetorMelhores = rfe.ranking_
 
     print("melhor n feature  " + str(bestNFeatures) + " score " + str(bestScore) )
     return {"nfeatures" :bestNFeatures,
-            "vetorVelhores" : vetorMelhores}
+            "vetorVelhores" : vetorMelhores,
+            "bestScore" : bestScore,
+            "bestAlpha" : alpha}
 
 
 
@@ -79,28 +111,31 @@ dados = pd.read_csv("tabelaTuplas.csv")
 ## concateno as colunas em um novo dataframe
 #dadosX = pd.concat([dados["temperature"], dados["solo"],dados["Precipitation"], dados["age"],dados["month"]], axis=1)
 dadosX = dados.drop(columns=["production","field","Id"])
-print(dadosX)
+#print(dadosX)
 dadosY = dados["production"]
-alpha = testeMelhorAlpha(dadosX,dadosY)
+Melhores = testGrid(dadosX,dadosY)
+
+
+#alpha = testeMelhorAlpha(dadosX,dadosY)
 #alpha = 0.2
-clf = linear_model.Lasso(alpha=alpha)
+clf = linear_model.Lasso(alpha=Melhores["bestAlpha"])
 clf.fit(dadosX, dadosY)
 print(clf.coef_)
 print(clf.intercept_)
 print("Score")
 print(clf.score(dadosX,dadosY)) ## quero q este score fique mais eprto de 0
 ## ja sei como selecionar minha features
-rfe = RFE(estimator=clf, n_features_to_select=1, step=1)
-rfe.fit(dadosX, dadosY)
-print("imporntancia das features " + str(rfe.ranking_))
-print("cross validataion")
-scores = cross_val_score(
-    clf, dadosX, dadosY, scoring='neg_mean_absolute_error',cv=10)
-print((scores))
-print(np.mean(scores))
+#rfe = RFE(estimator=clf, n_features_to_select=1, step=1)
+#rfe.fit(dadosX, dadosY)
+#print("imporntancia das features " + str(rfe.ranking_))
+#print("cross validataion")
+#scores = cross_val_score(
+#    clf, dadosX, dadosY, scoring='neg_mean_absolute_error',cv=10)
+#print((scores))
+#print(np.mean(scores))
 
-Melhores = selecionarMelhorQtdFeatures(dadosX,dadosY,clf)
-print(Melhores)
+#Melhores = selecionarMelhorQtdFeatures(dadosX,dadosY,clf)
+#print(Melhores)
 #selecionarBestFeatures(dadosX,rfe.ranking_)
 #reg.fit(dadosX, dadosY)
 #print(clf.feature_importances_ )
@@ -119,7 +154,7 @@ def escreverSubmissao(classificador):
     dadosVal = dadosValidar[list(dades.columns.values)]
     print("dados Validar")
     print(dadosVal)
-    classificador = linear_model.Lasso(alpha=alpha)
+    classificador = linear_model.Lasso(alpha=Melhores["bestAlpha"])
     classificador.fit(dades, dadosY)
 
 
