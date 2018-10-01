@@ -52,9 +52,9 @@ def testGrid(X,Y):
     vetorMelhores = []
     bestAlpha = 0;
 
-    alpha = 0.1;
-    astep = 0.01;
-    limite = 1;
+    alpha = 0.0001;
+    astep = 0.0001;
+    limite = 0.01;
     melhores = {}
     while alpha < limite:
         print("Alpha " + str(alpha))
@@ -110,7 +110,7 @@ dados = pd.read_csv("tabelaTuplas.csv")
 
 ## concateno as colunas em um novo dataframe
 #dadosX = pd.concat([dados["temperature"], dados["solo"],dados["Precipitation"], dados["age"],dados["month"]], axis=1)
-dadosX = dados.drop(columns=["production","field","Id"])
+dadosX = dados.drop(columns=["production","Id"])
 #print(dadosX)
 dadosY = dados["production"]
 Melhores = testGrid(dadosX,dadosY)
